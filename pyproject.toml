@@ -3,6 +3,9 @@ name = "vox-messages"
 version = "0.1.0"
 description = ""
 authors = ["Jhonatan Teixeira <jhonatan.teixeira@gmail.com>"]
+packages=[
+    {include = "vox_message"}
+]
 
 [tool.poetry.dependencies]
 python = "^3.8"

@@ -1,4 +1,4 @@
-from shutil import rmtree, copy, move
+from shutil import rmtree, move
 
 from invoke import task
 
