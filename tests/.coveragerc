@@ -1,0 +1,7 @@
+[run]
+source = ../vox_message
+
+[report]
+omit =
+    **/tests.py
+    tasks.py
