@@ -92,9 +92,11 @@ def send_next_message(topic=None):
             db.expunge(message)
             raise e
         except JSONDecodeError as e:
+            log.error(str(e), stack_info=True, exc_info=True)
             set_error_message(message, f'json error: {str(e)}')
             raise e
         except Exception as e:
+            log.error(str(e), stack_info=True, exc_info=True)
             set_error_message(message, str(e))
             raise e
     else:
@@ -130,6 +132,10 @@ def get_topics():
 
 def install_events():
     event.listen(Message, 'after_insert', send_message_after_insert)
+
+
+def uninstall_events():
+    event.remove(Message, 'after_insert', send_message_after_insert)
 
 
 install_events()

@@ -34,13 +34,13 @@ class JobRunner(Thread):
                 log.debug(f'no messages found for topic {self.topic}')
                 time.sleep(1)
             except Exception as e:  # pragma: no cover
-                log.error(e)
+                log.error(e, stack_info=True, exc_info=True)
                 db.rollback()
 
             finish = time.time()
             took = finish - start
 
-            if settings.DEBUG: # pragma: no cover
+            if settings.DEBUG:  # pragma: no cover
                 log.debug('took: %s seconds, speed: %s per second' % (str(took), str(round(1000/(took*1000)))))
 
             if self.once:
@@ -76,6 +76,7 @@ class TopicStarter(Thread):
     def is_healthy(self):
         for topic in self.jobs:
             if not self.jobs[topic].is_alive():
+                log.error(f'job for topic {topic} is not healthy')
                 return False
 
         return True

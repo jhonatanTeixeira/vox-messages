@@ -7,77 +7,6 @@ from django.test import TestCase
 from health_check.exceptions import HealthCheckException
 from rest_framework.status import HTTP_201_CREATED
 
-
-# settings.configure(
-#     DEBUG=True,
-#     USE_FORWARDER=True,
-#     ROOT_URLCONF='app.urls',
-#     KAFKA={
-#         'bootstrap_servers': 'kafka',
-#         'consumers': {
-#             'foo': {
-#                 'group_id': 'some-group',
-#                 'max_poll_records': 1,
-#                 'create_topic': False,
-#             },
-#             'bar': {
-#                 'group_id': 'other-group',
-#                 'max_poll_records': 10,
-#                 'create_topic': False,
-#             },
-#         }
-#     },
-#     INSTALLED_APPS=[
-#         'django.contrib.admin',
-#         'django.contrib.auth',
-#         'django.contrib.contenttypes',
-#         'django.contrib.sessions',
-#         'django.contrib.messages',
-#         'django.contrib.staticfiles',
-#         'django_sorcery',
-#         'rest_framework',
-#         'drf_yasg',
-#         'corsheaders',
-#         'rchlo_base',
-#         'message',
-#         'hse',
-#         'forwarder',
-#     ],
-#     DATABASES={
-#         'default': {
-#             'ENGINE': 'django.db.backends.sqlite3',
-#             'NAME': ':memory:',
-#             'ALCHEMY_OPTIONS': {
-#                 'engine_options': {
-#                     'connect_args': {'timeout': 10000}
-#                 }
-#             }
-#         }
-#     },
-#     LOGGING={
-#         'version': 1,
-#         'disable_existing_loggers': False,
-#         'handlers': {
-#             'console': {
-#                 'class': 'logging.StreamHandler',
-#             },
-#         },
-#         'loggers': {
-#             'sqlalchemy': {
-#                 'handlers': ['console'],
-#                 'level': 'INFO',
-#             },
-#             'kafka': {
-#                 'handlers': ['console'],
-#                 'level': 'INFO',
-#             },
-#         },
-#     },
-#     STATIC_URL='static/',
-#     STATIC_ROOT='static/',
-# )
-
-
 from rest_framework.test import APITestCase
 from sqlalchemy import event
 from sqlalchemy.orm.exc import StaleDataError
@@ -87,12 +16,12 @@ class TestSendMessages(TestCase):
     @patch('vox_message.messages.send_kafka_message')
     def test_should_send_next_message(self, send_kafka_message):
         from vox_message.models import db, Message
-        from vox_message.messages import send_message_after_insert
+        from vox_message.messages import send_message_after_insert, uninstall_events, install_events
         from vox_message.jobs import JobRunner
 
         runner = JobRunner('some-topic', True)
 
-        event.remove(Message, 'after_insert', send_message_after_insert)
+        uninstall_events()
 
         message = Message(event='some-topic', message={}, created_at=datetime.now(), locked=False)
         scheduled_message = Message(event='some-topic', message={}, created_at=datetime.now(), locked=False,
@@ -102,7 +31,7 @@ class TestSendMessages(TestCase):
         db.commit()
         id = message.pk
 
-        event.listen(Message, 'after_insert', send_message_after_insert)
+        install_events()
 
         runner.run()
         runner.run()
