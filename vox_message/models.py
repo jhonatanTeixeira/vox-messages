@@ -13,18 +13,18 @@ db = databases.get("default")
 
 @uml_model
 class Message(db.Model):
-    __tablename__ = 'TATL_ITGO_PRTO'
+    __tablename__ = 'tatl_itgo_prto'
 
-    pk = db.Column('CG_ITGO_PRTO', db.Integer(), db.Sequence('SATL_ITGO_PRTO'), primary_key=True)
-    event = db.Column('DS_EVTO_RZDO', db.String(length=256))
-    message_raw = db.Column('TE_INST_RZDO', db.String())
-    error_message = db.Column('DS_LOG_ERRO', db.String())
-    dispatched_at = db.Column('DH_INST_RZDO', db.DateTime(), nullable=True)
-    created_at = db.Column('DH_CDRO_RGRO', db.DateTime(), nullable=True)
-    version = db.Column('DH_VRSO', db.TIMESTAMP(), nullable=False)
-    locked = db.Column('IN_BLDO', db.Boolean(), nullable=False)
-    schedule_date = db.Column('DH_AGTO_EXEO', db.DateTime(), nullable=False, default=datetime.now())
-    message_source = db.Column('DS_OBTO_IRGEM', db.String(), nullable=True)
+    pk = db.Column('cg_itgo_prto', db.Integer(), db.Sequence('satl_itgo_prto'), primary_key=True)
+    event = db.Column('ds_evto_rzdo', db.String(length=256))
+    message_raw = db.Column('te_inst_rzdo', db.String())
+    error_message = db.Column('ds_log_erro', db.String())
+    dispatched_at = db.Column('dh_inst_rzdo', db.DateTime(), nullable=True)
+    created_at = db.Column('dh_cdro_rgro', db.DateTime(), nullable=True)
+    version = db.Column('dh_vrso', db.TIMESTAMP(), nullable=False)
+    locked = db.Column('in_bldo', db.Boolean(), nullable=False)
+    schedule_date = db.Column('dh_agto_exeo', db.DateTime(), nullable=False, default=datetime.now())
+    message_source = db.Column('ds_obto_irgem', db.String(), nullable=True)
 
     undelivered = db.queryproperty(dispatched_at=None)
 
@@ -57,15 +57,15 @@ class Message(db.Model):
 
 @uml_model
 class ConsumerEvent(db.Model):
-    __tablename__ = 'TATL_EVTO_CNDR'
+    __tablename__ = 'tatl_evto_cndr'
 
-    pk = db.Column('CG_EVTO_CNDR', db.Integer(), db.Sequence('SATL_EVTO_CNDR'),
+    pk = db.Column('cg_evto_cndr', db.Integer(), db.Sequence('satl_evto_cndr'),
                    primary_key=True)
-    message_pk = db.Column('CG_ITGO_PRTO', db.Integer(), db.ForeignKey('TATL_ITGO_PRTO.CG_ITGO_PRTO'))
+    message_pk = db.Column('cg_itgo_prto', db.Integer(), db.ForeignKey('tatl_itgo_prto.cg_itgo_prto'))
 
-    error_message = db.Column('DS_MNGM_ERRO', db.Text(), nullable=True)
-    consumer_name = db.Column('NO_EVTO_CNDR', db.String(length=256), nullable=False)
-    created_at = db.Column('DH_CDRO_RGRO', db.DateTime(), nullable=False, default=datetime.now())
-    is_error = db.Column('IN_EVTO_ERRO_CNDR', db.Boolean(), nullable=False, default=False)
+    error_message = db.Column('ds_mngm_erro', db.Text(), nullable=True)
+    consumer_name = db.Column('no_evto_cndr', db.String(length=256), nullable=False)
+    created_at = db.Column('dh_cdro_rgro', db.DateTime(), nullable=False, default=datetime.now())
+    is_error = db.Column('in_evto_erro_cndr', db.Boolean(), nullable=False, default=False)
 
     message = db.relationship(Message, backref=db.backref('consumer_events', cascade="all, delete-orphan"))
